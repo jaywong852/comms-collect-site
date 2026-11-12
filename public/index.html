@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>通訊稿收集｜揀通訊期</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">樂</div>
+          <div>
+            <h1>通訊稿收集</h1>
+          </div>
+        </div>
+        <a class="btn btn-secondary" href="/admin">後台</a>
+      </header>
+
+      <section class="card hero">
+        <div class="pill">📅 每期三個月</div>
+        <h2>先揀你要處理邊一期通訊</h2>
+      </section>
+
+      <section class="card">
+        <div id="period-groups">
+          <div class="empty">載入緊通訊期…</div>
+        </div>
+      </section>
+
+      <p class="footer-note">有問題可以搵負責同事 🙌</p>
+    </div>
+    <script src="/periods.js"></script>
+    <script src="/landing.js"></script>
+  </body>
+</html>

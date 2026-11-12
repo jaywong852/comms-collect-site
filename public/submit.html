@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>新增活動</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">樂</div>
+          <div>
+            <h1>通訊稿收集</h1>
+          </div>
+        </div>
+        <div class="top-actions">
+          <a class="btn btn-nav" href="/">主頁</a>
+        </div>
+      </header>
+
+      <section class="card hero">
+        <h2 id="period-title">載入緊…</h2>
+        <div class="period-page-nav">
+          <a class="btn btn-nav is-active" id="submit-link" href="/submit" aria-current="page">新增活動</a>
+          <a class="btn btn-nav" id="manage-link" href="/manage">活動一覽</a>
+          <a class="btn btn-nav" id="calendar-link" href="/calendar">日誌表</a>
+        </div>
+        <p>
+          歡迎交嚟你嘅活動通訊稿。呢份稿會歸入呢一期。標有
+          <span style="color: #b3543a">*</span> 嘅係必填。
+        </p>
+      </section>
+
+      <form class="card" id="submit-form" novalidate>
+        <input type="hidden" name="period" id="period" />
+        <div class="form-import-bar">
+          <button class="btn btn-secondary" type="button" id="import-btn">匯入以往活動</button>
+          <p class="form-import-hint">有類似活動可以先匯入，再改日期同其他欄位。</p>
+        </div>
+        <div class="msg" id="import-msg" role="status" aria-live="polite"></div>
+        <div class="form-grid">
+          <div class="field full">
+            <label for="name">活動名稱 <span class="req">*</span></label>
+            <input id="name" name="name" type="text" required maxlength="200" placeholder="例如：春季義工探訪日" autocomplete="off" />
+          </div>
+          <div class="field full">
+            <label for="series">所屬系列</label>
+            <select id="series" name="series"></select>
+          </div>
+          <div class="field full">
+            <label for="summary">簡介</label>
+            <textarea id="summary" name="summary" maxlength="1000" placeholder="簡短介紹活動重點…"></textarea>
+          </div>
+          <div class="field full">
+            <label for="content">內容</label>
+            <textarea id="content" name="content" class="tall" maxlength="8000" placeholder="活動詳細內容…"></textarea>
+          </div>
+          <div class="field full">
+            <label for="date">日期</label>
+            <input id="date" name="date" type="text" maxlength="200" placeholder="例如：1月11、18、25日；2月1日" />
+          </div>
+          <div class="field">
+            <label for="time">時間</label>
+            <input id="time" name="time" type="text" maxlength="80" placeholder="例如：下午2:30-4:00" />
+          </div>
+          <div class="field">
+            <label for="location">地點</label>
+            <input id="location" name="location" type="text" maxlength="300" placeholder="例如：社區中心地下禮堂／Zoom" />
+          </div>
+          <div class="field">
+            <label for="assemblyTime">集合時間</label>
+            <input id="assemblyTime" name="assemblyTime" type="text" maxlength="80" placeholder="例如：下午2:15" />
+          </div>
+          <div class="field">
+            <label for="assemblyPlace">集合地點</label>
+            <input id="assemblyPlace" name="assemblyPlace" type="text" maxlength="300" placeholder="例如：地下大堂入口" />
+          </div>
+          <div class="field">
+            <label for="audience">對象</label>
+            <input id="audience" name="audience" type="text" maxlength="300" placeholder="例如：全體同事／會員及親友" />
+          </div>
+          <div class="field">
+            <label for="quota">名額</label>
+            <input id="quota" name="quota" type="text" maxlength="80" placeholder="例如：30 人／先到先得" />
+          </div>
+          <div class="field">
+            <label for="fee">費用</label>
+            <input id="fee" name="fee" type="text" maxlength="120" placeholder="例如：免費／$50（含茶點）" />
+          </div>
+          <div class="field">
+            <label for="contact">負責人</label>
+            <input id="contact" name="contact" type="text" maxlength="120" placeholder="姓名／單位／聯絡方法" autocomplete="name" />
+          </div>
+          <div class="field full">
+            <label for="notes">備註</label>
+            <textarea id="notes" name="notes" maxlength="2000" placeholder="其他想補充嘅資料…"></textarea>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" type="submit" id="submit-btn">提交通訊稿</button>
+          <button class="btn btn-secondary" type="reset">清空表格</button>
+        </div>
+        <div class="msg" id="form-msg" role="status" aria-live="polite"></div>
+      </form>
+      <p class="footer-note">交完之後可以去「活動一覽」調動排列 🙌</p>
+    </div>
+
+    <div class="modal-backdrop" id="import-modal" aria-hidden="true">
+      <div class="modal import-modal" role="dialog" aria-modal="true" aria-labelledby="import-modal-title">
+        <h3 id="import-modal-title">匯入以往活動</h3>
+        <p class="import-modal-lead">揀一個以往活動，資料會填入表格；你再檢查日期同其他欄位，就可以提交做今期新活動。</p>
+        <label class="import-search-label" for="import-search">搜尋</label>
+        <input
+          type="search"
+          id="import-search"
+          placeholder="搜尋活動名稱或系列…"
+          autocomplete="off"
+        />
+        <div id="import-list" class="import-list" role="listbox" aria-label="可匯入嘅活動"></div>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" type="button" id="import-cancel">取消</button>
+        </div>
+      </div>
+    </div>
+    <script src="/periods.js"></script>
+    <script src="/series.js"></script>
+    <script src="/submit.js"></script>
+  </body>
+</html>

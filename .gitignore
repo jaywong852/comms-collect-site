@@ -1,0 +1,7 @@
+node_modules/
+data/submissions.json
+data/session-secret
+data/admin-auth.json
+.env
+*.log
+.DS_Store

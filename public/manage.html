@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>活動一覽</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">樂</div>
+          <div>
+            <h1>通訊稿收集</h1>
+          </div>
+        </div>
+        <div class="top-actions">
+          <a class="btn btn-nav" href="/">主頁</a>
+        </div>
+      </header>
+
+      <section class="card hero">
+        <h2 id="period-title">載入緊…</h2>
+        <div class="period-page-nav">
+          <a class="btn btn-nav" id="submit-link" href="/submit">新增活動</a>
+          <a class="btn btn-nav is-active" id="manage-link" href="/manage" aria-current="page">活動一覽</a>
+          <a class="btn btn-nav" id="calendar-link" href="/calendar">日誌表</a>
+        </div>
+      </section>
+
+      <section class="card login-box" id="auth-panel" hidden></section>
+
+      <section class="card" id="manage-panel" hidden>
+        <div class="admin-toolbar">
+          <div class="stats" id="stats">載入緊…</div>
+          <div class="toolbar-actions">
+            <button class="btn btn-secondary" type="button" id="refresh-btn">重新整理</button>
+            <button class="btn btn-secondary" type="button" id="logout-btn">登出</button>
+            <button class="btn btn-secondary" type="button" id="export-btn">匯出</button>
+            <button class="btn btn-danger" type="button" id="delete-mode-btn" aria-pressed="false" title="進入刪除模式">刪除</button>
+            <button class="btn btn-danger" type="button" id="delete-selected-btn" hidden disabled title="請先勾選要刪除嘅活動">刪除</button>
+          </div>
+        </div>
+        <div class="msg" id="status-msg" role="status" aria-live="polite"></div>
+        <div class="series-legend" id="series-legend" hidden aria-label="系列顏色說明"></div>
+        <div class="sort-list" id="list"></div>
+      </section>
+    </div>
+
+    <div class="modal-backdrop" id="modal" aria-hidden="true">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <h3 id="modal-title">編輯活動</h3>
+        <form id="edit-form" novalidate>
+          <div class="form-grid">
+            <div class="field full">
+              <label for="edit-name">活動名稱 <span class="req">*</span></label>
+              <input id="edit-name" name="name" type="text" required maxlength="200" />
+            </div>
+            <div class="field full">
+              <label for="edit-series">所屬系列</label>
+              <select id="edit-series" name="series"></select>
+            </div>
+            <div class="field full">
+              <label for="edit-summary">簡介</label>
+              <textarea id="edit-summary" name="summary" maxlength="1000"></textarea>
+            </div>
+            <div class="field full">
+              <label for="edit-content">內容</label>
+              <textarea id="edit-content" name="content" class="tall" maxlength="8000"></textarea>
+            </div>
+            <div class="field full">
+              <label for="edit-date">日期</label>
+              <input id="edit-date" name="date" type="text" maxlength="200" placeholder="例如：1月11、18、25日；2月1日" />
+            </div>
+            <div class="field">
+              <label for="edit-time">時間</label>
+              <input id="edit-time" name="time" type="text" maxlength="80" placeholder="例如：下午2:30-4:00" />
+            </div>
+            <div class="field">
+              <label for="edit-location">地點</label>
+              <input id="edit-location" name="location" type="text" maxlength="300" />
+            </div>
+            <div class="field">
+              <label for="edit-assemblyTime">集合時間</label>
+              <input id="edit-assemblyTime" name="assemblyTime" type="text" maxlength="80" placeholder="例如：下午2:15" />
+            </div>
+            <div class="field">
+              <label for="edit-assemblyPlace">集合地點</label>
+              <input id="edit-assemblyPlace" name="assemblyPlace" type="text" maxlength="300" placeholder="例如：地下大堂入口" />
+            </div>
+            <div class="field">
+              <label for="edit-audience">對象</label>
+              <input id="edit-audience" name="audience" type="text" maxlength="300" />
+            </div>
+            <div class="field">
+              <label for="edit-quota">名額</label>
+              <input id="edit-quota" name="quota" type="text" maxlength="80" />
+            </div>
+            <div class="field">
+              <label for="edit-fee">費用</label>
+              <input id="edit-fee" name="fee" type="text" maxlength="120" />
+            </div>
+            <div class="field">
+              <label for="edit-contact">負責人</label>
+              <input id="edit-contact" name="contact" type="text" maxlength="120" />
+            </div>
+            <div class="field full">
+              <label for="edit-notes">備註</label>
+              <textarea id="edit-notes" name="notes" maxlength="2000"></textarea>
+            </div>
+          </div>
+          <div class="msg" id="edit-msg" role="status" aria-live="polite"></div>
+          <div class="modal-actions">
+            <button class="btn btn-secondary" type="button" id="close-modal">取消</button>
+            <button class="btn btn-primary" type="submit" id="save-btn">儲存修改</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="/periods.js"></script>
+    <script src="/series.js"></script>
+    <script src="/auth-ui.js"></script>
+    <script src="/manage.js"></script>
+  </body>
+</html>
