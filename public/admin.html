@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-HK">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>後台｜通訊稿列表</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">樂</div>
+          <div>
+            <h1>通訊稿收集</h1>
+          </div>
+        </div>
+        <a class="btn btn-secondary" href="/">返回首頁</a>
+      </header>
+
+      <section class="card login-box" id="login-panel" hidden></section>
+
+      <section class="card" id="admin-panel" hidden>
+        <div class="admin-toolbar">
+          <div>
+            <h2 style="margin: 0 0 0.25rem; font-size: 1.25rem">提交列表</h2>
+            <div class="stats" id="stats">載入緊…</div>
+          </div>
+          <div style="display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center">
+            <label class="filter-label" for="period-filter">通訊期</label>
+            <select id="period-filter">
+              <option value="">全部時期</option>
+            </select>
+            <button class="btn btn-secondary" type="button" id="refresh-btn">重新整理</button>
+            <button class="btn btn-secondary" type="button" id="logout-btn">登出</button>
+          </div>
+        </div>
+        <div class="list" id="list"></div>
+      </section>
+    </div>
+
+    <div class="modal-backdrop" id="modal" aria-hidden="true">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <h3 id="modal-title">詳情</h3>
+        <div class="detail-grid" id="modal-body"></div>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" type="button" id="close-modal">關閉</button>
+          <button class="btn btn-danger" type="button" id="delete-btn">刪除呢份稿</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="/periods.js"></script>
+    <script src="/auth-ui.js"></script>
+    <script src="/admin.js"></script>
+  </body>
+</html>
