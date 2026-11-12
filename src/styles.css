@@ -1132,3 +1132,15 @@ body.manage-delete-mode .admin-toolbar {
   max-width: none;
   padding: 0;
 }
+
+.auth-switch {
+  margin-top: 0.35rem;
+  background: transparent;
+  color: var(--brand) !important;
+  padding: 0.35rem 0.2rem;
+  font-weight: 600;
+}
+
+.auth-switch:hover {
+  text-decoration: underline;
+}
