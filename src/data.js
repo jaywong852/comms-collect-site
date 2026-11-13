@@ -85,7 +85,7 @@ export function fromRow(row) {
 }
 
 function authRequired() {
-  const err = new Error('請先登入後台');
+  const err = new Error('請先登入');
   err.needsAuth = true;
   err.status = 401;
   return err;
