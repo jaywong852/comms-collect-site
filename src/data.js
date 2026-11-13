@@ -1,5 +1,6 @@
 import { parseActivityDates } from '../lib/dates.js';
 import { normalizeSeries, reindexPeriodInList } from '../lib/series.js';
+import { actionRequiresAdmin } from './access.js';
 import { currentAdminSession } from './auth.js';
 import { buildCalendarPayload, withNumbers } from './calendar-model.js';
 import {
@@ -101,6 +102,11 @@ async function requireAdmin() {
   const session = await currentAdminSession();
   if (!session) throw authRequired();
   return session;
+}
+
+async function requireAdminFor(action) {
+  if (!actionRequiresAdmin(action)) return null;
+  return requireAdmin();
 }
 
 function parsedDateList(period, dateText) {
@@ -216,12 +222,12 @@ async function writeSortOrders(rows) {
   );
   for (const result of results) {
     if (result.error) throw asError(result.error, '儲存次序失敗');
-    if (!result.data || !result.data.length) throw authRequired();
+    if (!result.data || !result.data.length) throw new Error('儲存次序失敗');
   }
 }
 
 export async function reorderSeries(period, series, ids) {
-  await requireAdmin();
+  await requireAdminFor('reorder');
   if (!parsePeriodId(period)) throw new Error('請提供通訊期');
   if (!Array.isArray(ids) || !ids.length) throw new Error('請提供排序 id 列表');
   const rows = await fetchPeriod(period);
@@ -246,7 +252,7 @@ export async function reorderSeries(period, series, ids) {
 }
 
 export async function updateSubmission(id, period, input) {
-  await requireAdmin();
+  await requireAdminFor('update');
   const fields = sanitizeSubmission(input);
   if (!fields.name) throw new Error('請填寫活動名稱');
   const rows = await fetchPeriod(period);
@@ -292,7 +298,7 @@ export async function updateSubmission(id, period, input) {
   if (dateChanged) patch.date_list = saved.dateList;
   const { data, error } = await supabase.from('submissions').update(patch).eq('id', id).select('id');
   if (error) throw asError(error, '儲存失敗');
-  if (!data || !data.length) throw authRequired();
+  if (!data || !data.length) throw new Error('儲存失敗');
   const original = new Map(rows.map((row) => [row.id, row.sortOrder]));
   await writeSortOrders(
     reindexed.filter((row) => row.period === period && row.id !== id && original.get(row.id) !== row.sortOrder)
@@ -302,7 +308,7 @@ export async function updateSubmission(id, period, input) {
 }
 
 export async function deleteSubmissions(period, ids) {
-  await requireAdmin();
+  await requireAdminFor('delete');
   if (!parsePeriodId(period)) throw new Error('請提供通訊期');
   const unique = [...new Set((ids || []).map(String).filter(Boolean))];
   if (!unique.length) throw new Error('請先勾選要刪除嘅活動');
@@ -326,7 +332,7 @@ export async function deleteSubmissions(period, ids) {
 }
 
 export async function fetchAdminList(period) {
-  await requireAdmin();
+  await requireAdminFor('admin-list');
   let query = supabase.from('submissions').select('*').limit(5000);
   if (period) {
     if (!parsePeriodId(period)) throw new Error('通訊期格式唔啱');

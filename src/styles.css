@@ -1133,6 +1133,10 @@ body.manage-delete-mode .admin-toolbar {
   padding: 0;
 }
 
+.login-box .auth-back {
+  margin-top: 0.85rem;
+}
+
 .auth-switch {
   margin-top: 0.35rem;
   background: transparent;

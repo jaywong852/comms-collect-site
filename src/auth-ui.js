@@ -9,8 +9,8 @@ function showMsg(el, type, text) {
 export function mountAuth(root, options) {
   if (!root) return;
   const opts = options || {};
-  const setupIntro = opts.setupIntro || '第一次用請先設定後台帳號（電郵同密碼）。之後要改活動、排序、刪除或者匯出 Word，都要登入。';
-  const loginIntro = opts.loginIntro || '請用後台電郵同密碼登入，先至可以整理活動或匯出文件。';
+  const setupIntro = opts.setupIntro || '第一次用請先設定後台帳號（電郵同密碼）。刪除活動要登入。';
+  const loginIntro = opts.loginIntro || '請用後台電郵同密碼登入，先至可以刪除活動。';
   let configuredNow = !!opts.configured;
 
   root.innerHTML =

@@ -9,6 +9,7 @@ import { parseActivityDates } from '../lib/dates.js';
 import { buildCalendarDoc, buildDetailsDoc } from '../lib/export-word.js';
 import { getHoliday } from '../lib/hk-holidays.js';
 import { reindexPeriodInList } from '../lib/series.js';
+import { actionRequiresAdmin, activityListCapabilities } from '../src/access.js';
 import { buildCalendarPayload } from '../src/calendar-model.js';
 import {
   groupPeriodsByFiscalYear,
@@ -169,6 +170,60 @@ test('calendar Word export is a landscape activity list', async () => {
   const xml = await docxXml(await buildCalendarDoc(payload));
   assert.match(xml, /活動一覽表/);
   assert.match(xml, /w:orient="landscape"/);
+});
+
+test('activity edit, reorder, and word export are public; only delete stays behind login', () => {
+  const visitor = activityListCapabilities(false);
+  const admin = activityListCapabilities(true);
+  assert.equal(visitor.view, true);
+  assert.equal(visitor.edit, true);
+  assert.equal(visitor.reorder, true);
+  assert.equal(visitor.deleteMode, false);
+  assert.equal(visitor.exportWord, true);
+  assert.equal(admin.edit, true);
+  assert.equal(admin.reorder, true);
+  assert.equal(admin.deleteMode, true);
+  assert.equal(admin.exportWord, true);
+
+  assert.equal(actionRequiresAdmin('update'), false);
+  assert.equal(actionRequiresAdmin('reorder'), false);
+  assert.equal(actionRequiresAdmin('delete'), true);
+  assert.equal(actionRequiresAdmin('export-details'), false);
+  assert.equal(actionRequiresAdmin('export-calendar'), false);
+  assert.equal(actionRequiresAdmin('admin-list'), true);
+
+  const manage = readFileSync(join(root, 'src/manage.js'), 'utf8');
+  const data = readFileSync(join(root, 'src/data.js'), 'utf8');
+  const exporters = readFileSync(join(root, 'src/exporters.js'), 'utf8');
+  const calendar = readFileSync(join(root, 'src/calendar.js'), 'utf8');
+  assert.match(manage, /await fetchPeriodNumbered\(period\)/);
+  assert.match(manage, /await updateSubmission\(currentId, period, data\)/);
+  assert.match(manage, /await reorderSeries\(period, seriesName, ids\)/);
+  assert.match(manage, /guard\(\(\) => deleteSubmissions\(period, ids\)\)/);
+  assert.match(manage, /exportDetails\(period\)/);
+  assert.doesNotMatch(manage, /guard\(\(\) => exportDetails/);
+  assert.doesNotMatch(manage, /guard\(\(\) => fetchPeriodNumbered/);
+  assert.doesNotMatch(manage, /guard\(\(\) => updateSubmission/);
+  assert.doesNotMatch(manage, /guard\(\(\) => reorderSeries/);
+  assert.match(data, /requireAdminFor\('delete'\)/);
+  assert.match(data, /requireAdminFor\('update'\)/);
+  assert.match(data, /requireAdminFor\('reorder'\)/);
+  assert.doesNotMatch(exporters, /currentAdminSession|needsAuth|assertExportAllowed/);
+  assert.doesNotMatch(calendar, /openAuthThenRetry|mountAuth|needsAuth/);
+  assert.match(calendar, /exportCalendar\(period\)/);
+
+  const sql = readFileSync(
+    join(root, 'supabase/migrations/20261113012200_allow_anonymous_submission_update.sql'),
+    'utf8'
+  );
+  assert.match(sql, /create policy submissions_public_update/);
+  assert.match(sql, /for update/);
+  assert.match(sql, /to anon, authenticated/);
+  assert.match(sql, /using \(true\)/);
+  assert.match(sql, /with check \(true\)/);
+  assert.doesNotMatch(sql, /for delete/i);
+  assert.doesNotMatch(sql, /drop policy[^;]*submissions_admin_delete/i);
+  assert.doesNotMatch(sql, /service_role/);
 });
 
 test('source does not ship secrets, submission dumps, or mainland import/export wording', () => {
