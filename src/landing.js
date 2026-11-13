@@ -13,6 +13,7 @@ function card(period) {
     '<div class="period-card-top">' +
     '<strong class="period-id"></strong>' +
     '<div class="period-label"></div>' +
+    '<p class="period-deadline"></p>' +
     '</div>' +
     '<div class="period-actions">' +
     '<a class="btn btn-primary submit-link">新增活動</a>' +
@@ -21,6 +22,9 @@ function card(period) {
     '</div>';
   el.querySelector('.period-id').textContent = period.issueLabel || periodIssueLabel(period.id);
   el.querySelector('.period-label').textContent = period.rangeLabel || periodRangeLabel(period.id);
+  const deadline = el.querySelector('.period-deadline');
+  deadline.textContent = period.deadlineLabel || '';
+  deadline.hidden = !deadline.textContent;
   el.querySelector('.submit-link').href = pageHref('submit', { period: period.id });
   el.querySelector('.manage-link').href = pageHref('manage', { period: period.id });
   el.querySelector('.calendar-link').href = pageHref('calendar', { period: period.id });

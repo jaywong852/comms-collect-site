@@ -2,6 +2,14 @@ const ISSUE_BASE_YEAR = 2027;
 const ISSUE_BASE_NUMBER = 65;
 const QUARTER_MONTHS = { 1: [1, 3], 2: [4, 6], 3: [7, 9], 4: [10, 12] };
 
+const PERIOD_DEADLINE_LABELS = {
+  '2027-Q1': '截止日期：3/11/2026(二)',
+  '2027-Q2': '截止日期：2/2/2027(二)',
+  '2027-Q3': '截止日期：4/5/2027(二)',
+  '2027-Q4': '截止日期：3/8/2027(二)',
+  '2028-Q1': '截止日期：2/11/2027(二)',
+};
+
 export function parsePeriodId(id) {
   const match = String(id || '').match(/^(\d{4})-Q([1-4])$/);
   if (!match) return null;
@@ -37,6 +45,10 @@ export function periodDisplayLabel(id) {
 
 export function periodLabelFallback(id) {
   return periodLabel(id);
+}
+
+export function periodDeadlineLabel(id) {
+  return PERIOD_DEADLINE_LABELS[id] || '';
 }
 
 export function periodMonths(id) {
@@ -91,6 +103,7 @@ export function listPeriods() {
       issueLabel: periodIssueLabel(id),
       rangeLabel: periodRangeLabel(id),
       label: periodLabel(id),
+      deadlineLabel: periodDeadlineLabel(id),
       year,
       quarter,
     });
