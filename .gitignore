@@ -1,4 +1,5 @@
 node_modules/
+dist/
 data/submissions.json
 data/session-secret
 data/admin-auth.json

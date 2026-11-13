@@ -10,7 +10,7 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/src/styles.css" />
   </head>
   <body>
     <div class="wrap">
@@ -22,16 +22,16 @@
           </div>
         </div>
         <div class="top-actions">
-          <a class="btn btn-nav" href="/">主頁</a>
+          <a class="btn btn-nav" id="home-link" href="../">主頁</a>
         </div>
       </header>
 
       <section class="card hero">
         <h2 id="period-title">載入緊…</h2>
         <div class="period-page-nav">
-          <a class="btn btn-nav" id="submit-link" href="/submit">新增活動</a>
-          <a class="btn btn-nav is-active" id="manage-link" href="/manage" aria-current="page">活動一覽</a>
-          <a class="btn btn-nav" id="calendar-link" href="/calendar">日誌表</a>
+          <a class="btn btn-nav" id="submit-link" href="../submit/">新增活動</a>
+          <a class="btn btn-nav is-active" id="manage-link" href="./" aria-current="page">活動一覽</a>
+          <a class="btn btn-nav" id="calendar-link" href="../calendar/">日誌表</a>
         </div>
       </section>
 
@@ -125,9 +125,6 @@
       </div>
     </div>
 
-    <script src="/periods.js"></script>
-    <script src="/series.js"></script>
-    <script src="/auth-ui.js"></script>
-    <script src="/manage.js"></script>
+    <script type="module" src="/src/manage.js"></script>
   </body>
 </html>
