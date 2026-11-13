@@ -26,8 +26,9 @@
 - 網站唔會提供預設密碼，亦唔會把密碼寫入程式、註解或者呢份說明。
 - 如果 Supabase 開咗「Confirm email」，設定帳號之後要先到電郵按確認連結（請用同一個瀏覽器打開），再用同一組電郵同密碼登入。想設定完即刻登入，可以喺 Supabase Auth 關掉電郵確認。呢個網站冇改呢個設定。
 - 請喺 Supabase Auth 的 URL Configuration 允許呢兩個網址，電郵確認先返到呢個站：
-  - `http://localhost:5173/comms-collect-site/`
-  - `https://jaywong852.github.io/comms-collect-site/`
+  - `http://localhost:5173/newsletter/`
+  - `https://lhiccmw.github.io/newsletter/`
+- 以前嘅網址（repo 轉名之前）係 `http://localhost:5173/comms-collect-site/` 同 `https://jaywong852.github.io/comms-collect-site/`。而家用上面兩個。
 
 ## 通訊期編碼
 
@@ -94,7 +95,7 @@ npm install
 npm run dev
 ```
 
-打開 http://localhost:5173/comms-collect-site/
+打開 http://localhost:5173/newsletter/
 
 ```bash
 npm test
@@ -102,7 +103,7 @@ npm run build
 npm run preview
 ```
 
-`npm run build` 會產出 `dist/`，base path 係 `/comms-collect-site/`。Word 匯出喺瀏覽器完成，唔使再行 Express。
+`npm run build` 會產出 `dist/`，base path 係 `/newsletter/`。公開網址係 https://lhiccmw.github.io/newsletter/。Word 匯出喺瀏覽器完成，唔使再行 Express。
 
 ## 資料
 
@@ -114,4 +115,4 @@ npm run preview
 
 ## GitHub Pages
 
-Push 去 `main` 會行 `.github/workflows/pages.yml`：測試、建置，再用 GitHub Actions 部署 Pages。Repo 設定要揀 GitHub Pages 來源為 GitHub Actions。呢個 workflow 唔會把 repo 改成 public。
+Push 去 `main` 會行 `.github/workflows/pages.yml`：測試、建置，再用 GitHub Actions 部署 Pages。Repo 設定要揀 GitHub Pages 來源為 GitHub Actions。網站會喺 https://lhiccmw.github.io/newsletter/。呢個 workflow 唔會把 repo 改成 public。
