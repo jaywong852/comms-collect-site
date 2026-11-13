@@ -1,3 +1,4 @@
+import { activityListCapabilities } from './access.js';
 import { fetchAuthStatus, logout } from './auth.js';
 import { deleteSubmissions, fetchPeriodNumbered, reorderSeries, updateSubmission } from './data.js';
 import { exportDetails } from './exporters.js';
@@ -31,6 +32,7 @@ if (period) {
   let dragSeries = null;
   let deleting = false;
   let deleteMode = false;
+  let isAdmin = false;
 
   bindHomeLink();
   bindPeriodNav(period);
@@ -58,20 +60,38 @@ if (period) {
     currentId = null;
   }
 
-  function showLoggedIn() {
-    authPanel.hidden = true;
-    managePanel.hidden = false;
-    loadList();
+  function capabilities() {
+    return activityListCapabilities(isAdmin);
   }
 
-  function showLoggedOut(configured) {
-    managePanel.hidden = true;
-    authPanel.hidden = false;
+  function applySessionChrome() {
+    if (logoutBtn) logoutBtn.hidden = !isAdmin;
+    updateDeleteModeUI();
+  }
+
+  function promptLogin(configured) {
     closeEdit();
+    authPanel.hidden = false;
     mountAuth(authPanel, {
       configured: !!configured,
-      onSuccess: showLoggedIn,
+      setupIntro: '刪除活動要先設定後台帳號。編輯、排序同匯出唔使登入。',
+      loginIntro: '刪除活動要先登入後台。編輯、排序同匯出唔使登入。',
+      onSuccess: async () => {
+        isAdmin = true;
+        authPanel.hidden = true;
+        applySessionChrome();
+        await loadList();
+      },
     });
+    const back = document.createElement('button');
+    back.className = 'btn btn-secondary auth-back';
+    back.type = 'button';
+    back.textContent = '返回活動一覽';
+    back.addEventListener('click', () => {
+      authPanel.hidden = true;
+    });
+    authPanel.appendChild(back);
+    authPanel.scrollIntoView({ block: 'nearest' });
   }
 
   async function guard(action) {
@@ -79,8 +99,12 @@ if (period) {
       return await action();
     } catch (err) {
       if (err && err.needsAuth) {
-        const status = await fetchAuthStatus().catch(() => ({ configured: true }));
-        showLoggedOut(!!status.configured);
+        const status = await fetchAuthStatus().catch(() => ({ configured: true, isAdmin: false }));
+        isAdmin = !!status.isAdmin;
+        if (!isAdmin) {
+          setDeleteMode(false);
+          promptLogin(!!status.configured);
+        }
         const wrapped = new Error('請先登入後台');
         wrapped.needsAuth = true;
         throw wrapped;
@@ -92,12 +116,13 @@ if (period) {
   async function checkAuth() {
     try {
       const status = await fetchAuthStatus();
-      if (status.isAdmin) showLoggedIn();
-      else showLoggedOut(status.configured);
+      isAdmin = !!status.isAdmin;
     } catch (err) {
-      showLoggedOut(false);
+      isAdmin = false;
       showStatus('err', '未能確認登入狀態，請稍後再試');
     }
+    if (deleteMode && !capabilities().deleteMode) setDeleteMode(false);
+    else applySessionChrome();
   }
 
   function fillForm(item) {
@@ -149,7 +174,11 @@ if (period) {
     if (deleteModeBtn) {
       deleteModeBtn.setAttribute('aria-pressed', deleteMode ? 'true' : 'false');
       deleteModeBtn.textContent = deleteMode ? '完成' : '刪除';
-      deleteModeBtn.title = deleteMode ? '結束刪除模式' : '進入刪除模式，先勾選再刪除';
+      deleteModeBtn.title = deleteMode
+        ? '結束刪除模式'
+        : capabilities().deleteMode
+          ? '進入刪除模式，先勾選再刪除'
+          : '刪除要先登入後台';
       deleteModeBtn.classList.toggle('btn-danger', !deleteMode);
       deleteModeBtn.classList.toggle('btn-secondary', deleteMode);
     }
@@ -158,7 +187,7 @@ if (period) {
   }
 
   function setDeleteMode(on) {
-    deleteMode = !!on;
+    deleteMode = !!on && capabilities().deleteMode;
     if (!deleteMode) selectedIds = {};
     updateDeleteModeUI();
     render();
@@ -284,7 +313,7 @@ if (period) {
       group.items.forEach((item) => {
         const row = document.createElement('div');
         row.className = `sort-item ${tone}`;
-        row.draggable = true;
+        row.draggable = capabilities().reorder;
         row.dataset.id = item.id;
         row.dataset.series = group.series;
         row.title = '拉動整個框框調次序（同一系列內）';
@@ -332,10 +361,15 @@ if (period) {
           });
         }
 
-        row.querySelector('.edit-btn').addEventListener('click', (event) => {
-          event.stopPropagation();
-          openEdit(item);
-        });
+        const editBtn = row.querySelector('.edit-btn');
+        if (capabilities().edit) {
+          editBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            openEdit(item);
+          });
+        } else {
+          editBtn.hidden = true;
+        }
         const deleteBtn = row.querySelector('.delete-btn');
         if (deleteBtn) {
           deleteBtn.addEventListener('click', (event) => {
@@ -409,11 +443,10 @@ if (period) {
 
   async function persistOrder(seriesName, ids) {
     try {
-      items = await guard(() => reorderSeries(period, seriesName, ids));
+      items = await reorderSeries(period, seriesName, ids);
       showStatus('ok', '次序已儲存（編號已按系列更新）');
       render();
     } catch (err) {
-      if (err && err.needsAuth) return;
       showStatus('err', err.message || '儲存次序失敗');
       await loadList();
     }
@@ -422,11 +455,10 @@ if (period) {
   async function loadList() {
     statsEl.textContent = '載入緊…';
     try {
-      items = await guard(() => fetchPeriodNumbered(period));
+      items = await fetchPeriodNumbered(period);
       pruneSelection();
       render();
     } catch (err) {
-      if (err && err.needsAuth) return;
       statsEl.textContent = err.message || '載入失敗';
       listEl.replaceChildren();
       const empty = document.createElement('div');
@@ -449,12 +481,12 @@ if (period) {
     saveBtn.disabled = true;
     saveBtn.textContent = '儲存緊…';
     try {
-      await guard(() => updateSubmission(currentId, period, data));
+      await updateSubmission(currentId, period, data);
       closeEdit();
       showStatus('ok', '已更新活動資料');
       await loadList();
     } catch (err) {
-      if (!(err && err.needsAuth)) showEditMsg('err', err.message || '儲存失敗');
+      showEditMsg('err', err.message || '儲存失敗');
     } finally {
       saveBtn.disabled = false;
       saveBtn.textContent = '儲存修改';
@@ -471,22 +503,45 @@ if (period) {
       closeEdit();
       return;
     }
+    if (!authPanel.hidden) {
+      authPanel.hidden = true;
+      return;
+    }
     if (deleteMode) setDeleteMode(false);
   });
   refreshBtn.addEventListener('click', loadList);
-  if (exportBtn) {
-    exportBtn.addEventListener('click', () => {
-      exportBtn.disabled = true;
-      guard(() => exportDetails(period))
-        .catch((err) => {
-          if (!(err && err.needsAuth)) showStatus('err', err.message || '匯出失敗，請稍後再試');
-        })
-        .then(() => {
-          exportBtn.disabled = false;
-        });
+  function runExport() {
+    exportBtn.disabled = true;
+    exportDetails(period)
+      .catch((err) => {
+        showStatus('err', (err && err.message) || '匯出失敗，請稍後再試');
+      })
+      .then(() => {
+        exportBtn.disabled = false;
+      });
+  }
+
+  if (exportBtn) exportBtn.addEventListener('click', runExport);
+  if (deleteModeBtn) {
+    deleteModeBtn.addEventListener('click', () => {
+      if (deleteMode) {
+        setDeleteMode(false);
+        return;
+      }
+      if (!capabilities().deleteMode) {
+        fetchAuthStatus()
+          .then((status) => {
+            isAdmin = !!status.isAdmin;
+            applySessionChrome();
+            if (capabilities().deleteMode) setDeleteMode(true);
+            else promptLogin(status.configured);
+          })
+          .catch(() => promptLogin(true));
+        return;
+      }
+      setDeleteMode(true);
     });
   }
-  if (deleteModeBtn) deleteModeBtn.addEventListener('click', () => setDeleteMode(!deleteMode));
   if (deleteSelectedBtn) {
     deleteSelectedBtn.addEventListener('click', () => {
       const list = selectedItems();
@@ -500,11 +555,14 @@ if (period) {
   if (logoutBtn) {
     logoutBtn.addEventListener('click', async () => {
       await logout();
-      const status = await fetchAuthStatus().catch(() => ({ configured: true }));
-      showLoggedOut(!!status.configured);
+      isAdmin = false;
+      authPanel.hidden = true;
+      setDeleteMode(false);
+      applySessionChrome();
     });
   }
 
   updateDeleteModeUI();
   checkAuth();
+  loadList();
 }

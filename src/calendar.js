@@ -1,7 +1,5 @@
-import { fetchAuthStatus } from './auth.js';
 import { fetchCalendar } from './data.js';
 import { exportCalendar } from './exporters.js';
-import { mountAuth } from './auth-ui.js';
 import { bindHomeLink, bindPeriodNav, showPeriodTitle } from './nav.js';
 import { requirePeriodOrRedirect } from './paths.js';
 
@@ -12,46 +10,10 @@ if (period) {
   const unplacedCard = document.getElementById('unplaced-card');
   const unplacedList = document.getElementById('unplaced-list');
   const exportBtn = document.getElementById('export-btn');
-  const authModal = document.getElementById('auth-modal');
 
   bindHomeLink();
   bindPeriodNav(period);
   showPeriodTitle(period, '日誌表');
-
-  function closeAuthModal() {
-    if (!authModal) return;
-    authModal.classList.remove('show');
-    authModal.setAttribute('aria-hidden', 'true');
-  }
-
-  function openAuthThenRetry(retry) {
-    const panel = document.getElementById('auth-panel');
-    if (!authModal || !panel) {
-      alert('匯出 Word 要先登入後台。請先到活動一覽登入，再返嚟匯出。');
-      return;
-    }
-    fetchAuthStatus()
-      .then((status) => {
-        if (status.isAdmin) {
-          retry();
-          return;
-        }
-        mountAuth(panel, {
-          configured: status.configured,
-          setupIntro: '第一次用請先設定後台帳號。設定之後就可以匯出日誌表。',
-          loginIntro: '匯出 Word 要先登入後台。登入成功之後會再試一次匯出。',
-          onSuccess: () => {
-            closeAuthModal();
-            retry();
-          },
-        });
-        authModal.classList.add('show');
-        authModal.setAttribute('aria-hidden', 'false');
-      })
-      .catch(() => {
-        alert('未能確認登入狀態，請稍後再試');
-      });
-  }
 
   function renderMonth(month) {
     const section = document.createElement('section');
@@ -168,11 +130,7 @@ if (period) {
     exportBtn.disabled = true;
     exportCalendar(period)
       .catch((err) => {
-        if (err && err.needsAuth) {
-          openAuthThenRetry(tryCalendarExport);
-          return;
-        }
-        alert(err.message || '匯出失敗，請稍後再試');
+        alert((err && err.message) || '匯出失敗，請稍後再試');
       })
       .then(() => {
         exportBtn.disabled = false;
@@ -180,14 +138,6 @@ if (period) {
   }
 
   if (exportBtn) exportBtn.addEventListener('click', tryCalendarExport);
-  if (authModal) {
-    authModal.addEventListener('click', (event) => {
-      if (event.target === authModal) closeAuthModal();
-    });
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape' && authModal.classList.contains('show')) closeAuthModal();
-    });
-  }
 
   load();
 }

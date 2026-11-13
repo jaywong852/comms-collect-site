@@ -71,8 +71,8 @@ function setAuthed(isAuthed) {
 function mountAuthPanel(configured) {
   mountAuth(loginPanel, {
     configured: !!configured,
-    setupIntro: '第一次用請先設定後台帳號，用嚟進入後台同管理活動一覽。',
-    loginIntro: '後台用嚟總覽各期通訊稿。活動一覽嘅編輯、排序、刪除同匯出都要用呢個帳號。',
+    setupIntro: '第一次用請先設定後台帳號，用嚟進入後台同刪除活動。',
+    loginIntro: '後台用嚟總覽各期通訊稿。活動一覽嘅刪除要用呢個帳號。',
     onSuccess: () => {
       afterLogin();
     },
