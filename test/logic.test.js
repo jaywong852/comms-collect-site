@@ -14,6 +14,7 @@ import { buildCalendarPayload } from '../src/calendar-model.js';
 import {
   groupPeriodsByFiscalYear,
   listPeriods,
+  periodDeadlineLabel,
   periodFiscalYearLabel,
   periodIssueNumber,
   periodLabel,
@@ -41,6 +42,30 @@ test('period issues and fiscal year grouping stay on the existing scale', () => 
     ['2027-Q1']
   );
   assert.ok(groups[0].startYear > groups[1].startYear);
+});
+
+test('homepage periods carry the given submission deadlines', () => {
+  const expected = {
+    '2027-Q1': '截止日期：3/11/2026(二)',
+    '2027-Q2': '截止日期：2/2/2027(二)',
+    '2027-Q3': '截止日期：4/5/2027(二)',
+    '2027-Q4': '截止日期：3/8/2027(二)',
+    '2028-Q1': '截止日期：2/11/2027(二)',
+  };
+  const periods = listPeriods();
+  assert.deepEqual(
+    periods.map((period) => period.id),
+    Object.keys(expected)
+  );
+  periods.forEach((period) => {
+    assert.equal(period.deadlineLabel, expected[period.id]);
+    assert.equal(periodDeadlineLabel(period.id), expected[period.id]);
+    assert.equal(period.deadlineLabel.includes(' '), false);
+  });
+
+  const landing = readFileSync(join(root, 'src/landing.js'), 'utf8');
+  assert.match(landing, /period\.deadlineLabel/);
+  assert.doesNotMatch(landing, /3\/11\/2026|截止日期/);
 });
 
 test('date text parses month lists, semicolons, weekdays, and 及', () => {

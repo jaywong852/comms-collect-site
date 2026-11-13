@@ -74,8 +74,8 @@ if (period) {
     authPanel.hidden = false;
     mountAuth(authPanel, {
       configured: !!configured,
-      setupIntro: '刪除活動要先設定後台帳號。編輯、排序同匯出唔使登入。',
-      loginIntro: '刪除活動要先登入後台。編輯、排序同匯出唔使登入。',
+      setupIntro: '刪除活動要先設定登入帳號。編輯、排序同匯出唔使登入。',
+      loginIntro: '刪除活動要先登入。編輯、排序同匯出唔使登入。',
       onSuccess: async () => {
         isAdmin = true;
         authPanel.hidden = true;
@@ -105,7 +105,7 @@ if (period) {
           setDeleteMode(false);
           promptLogin(!!status.configured);
         }
-        const wrapped = new Error('請先登入後台');
+        const wrapped = new Error('請先登入');
         wrapped.needsAuth = true;
         throw wrapped;
       }
@@ -178,7 +178,7 @@ if (period) {
         ? '結束刪除模式'
         : capabilities().deleteMode
           ? '進入刪除模式，先勾選再刪除'
-          : '刪除要先登入後台';
+          : '刪除要先登入';
       deleteModeBtn.classList.toggle('btn-danger', !deleteMode);
       deleteModeBtn.classList.toggle('btn-secondary', deleteMode);
     }

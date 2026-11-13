@@ -9,14 +9,14 @@ function showMsg(el, type, text) {
 export function mountAuth(root, options) {
   if (!root) return;
   const opts = options || {};
-  const setupIntro = opts.setupIntro || '第一次用請先設定後台帳號（電郵同密碼）。刪除活動要登入。';
-  const loginIntro = opts.loginIntro || '請用後台電郵同密碼登入，先至可以刪除活動。';
+  const setupIntro = opts.setupIntro || '第一次用請先設定登入帳號（電郵同密碼）。刪除活動要登入。';
+  const loginIntro = opts.loginIntro || '請用登入帳號嘅電郵同密碼登入，先至可以刪除活動。';
   let configuredNow = !!opts.configured;
 
   root.innerHTML =
     '<div id="setup-view">' +
-      '<div class="pill" aria-hidden="true">設定後台帳號</div>' +
-      '<h2>設定後台帳號</h2>' +
+      '<div class="pill" aria-hidden="true">設定登入帳號</div>' +
+      '<h2>設定登入帳號</h2>' +
       '<p id="setup-intro"></p>' +
       '<form id="setup-form" autocomplete="on">' +
         '<div class="field">' +
@@ -35,12 +35,12 @@ export function mountAuth(root, options) {
           '<button class="btn btn-primary" type="submit" id="setup-btn">儲存並進入</button>' +
         '</div>' +
         '<div class="msg" id="setup-msg" role="status" aria-live="polite"></div>' +
-        '<button class="btn auth-switch" type="button" id="switch-to-login">已有後台帳號？登入</button>' +
+        '<button class="btn auth-switch" type="button" id="switch-to-login">已有登入帳號？登入</button>' +
       '</form>' +
     '</div>' +
     '<div id="login-view">' +
-      '<div class="pill" aria-hidden="true">後台登入</div>' +
-      '<h2>後台登入</h2>' +
+      '<div class="pill" aria-hidden="true">登入</div>' +
+      '<h2>登入</h2>' +
       '<p id="login-intro"></p>' +
       '<form id="login-form" autocomplete="on">' +
         '<div class="field">' +
@@ -55,7 +55,7 @@ export function mountAuth(root, options) {
           '<button class="btn btn-primary" type="submit" id="login-btn">登入</button>' +
         '</div>' +
         '<div class="msg" id="login-msg" role="status" aria-live="polite"></div>' +
-        '<button class="btn auth-switch" type="button" id="switch-to-setup">未有帳號？設定後台帳號</button>' +
+        '<button class="btn auth-switch" type="button" id="switch-to-setup">未有帳號？設定登入帳號</button>' +
       '</form>' +
     '</div>';
 

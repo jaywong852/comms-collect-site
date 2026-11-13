@@ -35,14 +35,14 @@ export function isAlreadyConfiguredError(error) {
 
 export function authErrorText(error, fallback) {
   const raw = String(error?.message || '');
-  if (/已經設定|不能再註冊/.test(raw)) return '後台帳號已經設定，請登入。';
-  if (/already registered|user already registered/i.test(raw)) return '後台帳號已經設定，請登入。';
+  if (/已經設定|不能再註冊/.test(raw)) return '登入帳號已經設定，請登入。';
+  if (/already registered|user already registered/i.test(raw)) return '登入帳號已經設定，請登入。';
   if (/email not confirmed/i.test(raw)) return '請先到電郵按確認連結，然後再登入。';
   if (/invalid login credentials/i.test(raw)) return '電郵或密碼唔啱，請再試';
   if (/password should be at least/i.test(raw)) return '密碼最少要 8 個字元';
   if (/valid email|unable to validate email/i.test(raw)) return '請輸入有效嘅電郵地址';
   if (/database error saving new user/i.test(raw)) {
-    return '註冊未完成。如果後台帳號已經設定，請改用登入。';
+    return '註冊未完成。如果登入帳號已經設定，請改用登入。';
   }
   return raw || fallback;
 }
@@ -112,7 +112,7 @@ export async function setupAccount(email, password) {
   }
   if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
     markAdminConfigured();
-    const err = new Error('後台帳號已經設定，請登入。');
+    const err = new Error('登入帳號已經設定，請登入。');
     err.needsLogin = true;
     throw err;
   }
